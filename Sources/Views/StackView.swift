@@ -135,7 +135,19 @@ open class StackView: UIView {
             sublayouts: sublayouts,
             config: nil)
 
-        return InsetLayout(insets: contentInsets, sublayout: stack)
+        let insetLayout = InsetLayout(insets: contentInsets, sublayout: stack)
+
+        if (intrinsicWidth != nil || intrinsicHeight != nil) {
+            return SizeLayout(
+                minWidth: intrinsicWidth,
+                maxWidth: intrinsicWidth,
+                minHeight: intrinsicHeight,
+                maxHeight: intrinsicHeight,
+                sublayout: insetLayout
+            )
+        } else {
+            return insetLayout
+        }
     }
 }
 
