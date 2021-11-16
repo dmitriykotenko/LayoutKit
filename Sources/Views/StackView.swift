@@ -108,9 +108,10 @@ open class StackView: UIView {
     }
 
     private var stackLayout: Layout {
-        let sublayouts = arrangedSubviews.map { view -> Layout in
-            return ViewLayout(view: view)
-        }
+      let sublayouts = arrangedSubviews
+        .filter { !$0.isHidden }
+        .map { ViewLayout(view: $0) }
+
         let stack = StackLayout(
             axis: axis,
             spacing: spacing,
