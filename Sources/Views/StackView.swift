@@ -43,6 +43,9 @@ open class StackView: UIView {
     /// The stack's alignment inside its parent.
     public let alignment: Alignment
 
+    /// The alignment of stack's children.
+    public let childrenAlignment: Alignment
+
     /// The stack's flexibility.
     public let flexibility: Flexibility?
 
@@ -57,6 +60,7 @@ open class StackView: UIView {
                 distribution: StackLayoutDistribution = .leading,
                 contentInsets: UIEdgeInsets = .zero,
                 alignment: Alignment = .fill,
+                childrenAlignment: Alignment = .fill,
                 flexibility: Flexibility? = nil,
                 intrinsicWidth: CGFloat? = nil,
                 intrinsicHeight: CGFloat? = nil) {
@@ -66,6 +70,7 @@ open class StackView: UIView {
         self.distribution = distribution
         self.contentInsets = contentInsets
         self.alignment = alignment
+        self.childrenAlignment = childrenAlignment
         self.flexibility = flexibility
         self.intrinsicWidth = intrinsicWidth
         self.intrinsicHeight = intrinsicHeight
@@ -124,7 +129,7 @@ open class StackView: UIView {
     private var stackLayout: Layout {
       let sublayouts = arrangedSubviews
         .filter { !$0.isHidden }
-        .map { ViewLayout(view: $0) }
+        .map { ViewLayout(alignment: childrenAlignment, view: $0) }
 
         let stack = StackLayout(
             axis: axis,
@@ -154,6 +159,7 @@ open class StackView: UIView {
 /// Wraps a UIView so that it conforms to the Layout protocol.
 private struct ViewLayout: ConfigurableLayout {
 
+    let alignment: Alignment
     let needsView = true
     let view: UIView
     let viewReuseId: String? = nil
@@ -164,7 +170,9 @@ private struct ViewLayout: ConfigurableLayout {
     }
 
     func arrangement(within rect: CGRect, measurement: LayoutMeasurement) -> LayoutArrangement {
-        return LayoutArrangement(layout: self, frame: rect, sublayouts: [])
+        let actualSize = view.sizeThatFits(rect.size)
+        let alignedFrame = alignment.position(size: actualSize, in: rect)
+        return LayoutArrangement(layout: self, frame: alignedFrame, sublayouts: [])
     }
 
     func makeView() -> UIView {
