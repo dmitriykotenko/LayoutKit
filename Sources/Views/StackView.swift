@@ -46,6 +46,10 @@ open class StackView: UIView {
     /// The stack's flexibility.
     public let flexibility: Flexibility?
 
+    public var intrinsicWidth: CGFloat?
+
+    public var intrinsicHeight: CGFloat?
+
     private var arrangedSubviews: [UIView] = []
 
     public init(axis: Axis,
@@ -53,7 +57,9 @@ open class StackView: UIView {
                 distribution: StackLayoutDistribution = .leading,
                 contentInsets: UIEdgeInsets = .zero,
                 alignment: Alignment = .fill,
-                flexibility: Flexibility? = nil) {
+                flexibility: Flexibility? = nil,
+                intrinsicWidth: CGFloat? = nil,
+                intrinsicHeight: CGFloat? = nil) {
 
         self.axis = axis
         self.spacing = spacing
@@ -61,6 +67,9 @@ open class StackView: UIView {
         self.contentInsets = contentInsets
         self.alignment = alignment
         self.flexibility = flexibility
+        self.intrinsicWidth = intrinsicWidth
+        self.intrinsicHeight = intrinsicHeight
+
         super.init(frame: .zero)
     }
 
@@ -100,7 +109,12 @@ open class StackView: UIView {
     }
 
     open override var intrinsicContentSize: CGSize {
-        return sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
+        return sizeThatFits(
+            CGSize(
+                width: intrinsicWidth ?? CGFloat.greatestFiniteMagnitude,
+                height: intrinsicHeight ?? CGFloat.greatestFiniteMagnitude
+            )
+        )
     }
 
     open override func layoutSubviews() {
