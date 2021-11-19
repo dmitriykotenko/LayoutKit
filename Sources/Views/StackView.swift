@@ -129,7 +129,7 @@ open class StackView: UIView {
     private var stackLayout: Layout {
       let sublayouts = arrangedSubviews
         .filter { !$0.isHidden }
-        .map { ViewLayout(alignment: childrenAlignment, view: $0) }
+        .map { BoilerplateLayout($0, alignment: childrenAlignment) }
 
         let stack = StackLayout(
             axis: axis,
@@ -152,49 +152,6 @@ open class StackView: UIView {
             )
         } else {
             return insetLayout
-        }
-    }
-}
-
-/// Wraps a UIView so that it conforms to the Layout protocol.
-private struct ViewLayout: ConfigurableLayout {
-
-    let alignment: Alignment
-    let needsView = true
-    let view: UIView
-    let viewReuseId: String? = nil
-
-    func measurement(within maxSize: CGSize) -> LayoutMeasurement {
-        let size = view.sizeThatFits(maxSize)
-        return LayoutMeasurement(layout: self, size: size, maxSize: maxSize, sublayouts: [])
-    }
-
-    func arrangement(within rect: CGRect, measurement: LayoutMeasurement) -> LayoutArrangement {
-        let actualSize = view.sizeThatFits(rect.size)
-        let alignedFrame = alignment.position(size: actualSize, in: rect)
-        return LayoutArrangement(layout: self, frame: alignedFrame, sublayouts: [])
-    }
-
-    func makeView() -> UIView {
-        return view
-    }
-
-    func configure(view: UIView) {
-        // Nothing to configure.
-    }
-
-    var flexibility: Flexibility {
-        let horizontal = flexForAxis(.horizontal)
-        let vertical = flexForAxis(.vertical)
-        return Flexibility(horizontal: horizontal, vertical: vertical)
-    }
-
-    private func flexForAxis(_ axis: NSLayoutConstraint.Axis) -> Flexibility.Flex {
-        switch view.contentHuggingPriority(for: .horizontal) {
-        case UILayoutPriority.required:
-            return nil
-        case let priority:
-            return -Int32(priority.rawValue)
         }
     }
 }
