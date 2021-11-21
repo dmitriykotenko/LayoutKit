@@ -22,7 +22,7 @@ public struct BoilerplateLayout: ConfigurableLayout {
       layout: self,
       size: view.sizeThatFits(maxSize),
       maxSize: maxSize,
-      sublayouts: sublayouts.map { $0.measurement(within: maxSize) }
+      sublayouts: []
     )
   }
 
@@ -44,15 +44,10 @@ public struct BoilerplateLayout: ConfigurableLayout {
     )
   }
 
-  private var sublayouts: [Layout] {
-    mainSublayout.map { [$0] } ?? []
+  public func makeView() -> UIView {
+    view.layoutSubviews()
+    return view
   }
-
-  private var mainSublayout: Layout? {
-    ((view as? LayoutContainer)?.layout)
-  }
-
-  public func makeView() -> UIView { view }
 
   public func configure(view: UIView) {}
 
