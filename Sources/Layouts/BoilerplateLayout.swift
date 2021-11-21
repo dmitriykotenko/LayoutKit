@@ -12,7 +12,7 @@ public struct BoilerplateLayout: ConfigurableLayout {
   public let viewReuseId: String? = nil
 
   public init(_ view: UIView,
-              alignment: Alignment = .center) {
+              alignment: Alignment = .fill) {
     self.view = view
     self.alignment = alignment
   }
