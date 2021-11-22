@@ -45,7 +45,6 @@ public struct BoilerplateLayout: ConfigurableLayout {
   }
 
   public func makeView() -> UIView {
-    view.layoutSubviews()
     return view
   }
 
