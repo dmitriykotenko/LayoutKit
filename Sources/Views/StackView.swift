@@ -90,21 +90,32 @@ open class StackView: UIView {
      */
     open func addArrangedSubviews(_ subviews: [UIView]) {
         arrangedSubviews.append(contentsOf: subviews)
-        for subview in subviews {
-            addSubview(subview)
-        }
+        subviews.forEach(addSubview)
+
+        updateContentHuggingPriority()
         invalidateIntrinsicContentSize()
         setNeedsLayout()
+    }
+
+    private func updateContentHuggingPriority() {
+        setContentHuggingPriority(
+            .from(stackLayout.flexibility.flex(.horizontal)),
+            for: .horizontal
+        )
+
+        setContentHuggingPriority(
+            .from(stackLayout.flexibility.flex(.vertical)),
+            for: .vertical
+        )
     }
 
     /**
      Deletes all subviews from the stack.
      */
     open func removeArrangedSubviews() {
-        for subview in arrangedSubviews {
-            subview.removeFromSuperview()
-        }
+        arrangedSubviews.forEach { $0.removeFromSuperview() }
         arrangedSubviews.removeAll()
+
         invalidateIntrinsicContentSize()
         setNeedsLayout()
     }
@@ -154,5 +165,25 @@ open class StackView: UIView {
         } else {
             return insetLayout
         }
+    }
+}
+
+
+private extension UILayoutPriority {
+
+    static func from(_ flex: Flexibility.Flex) -> UILayoutPriority {
+        flex.map { UILayoutPriority(rawValue: Float(-$0).clipped(inside: 0...999)) }
+        ?? .required
+    }
+}
+
+
+private extension Comparable {
+
+    func clipped(inside bounds: ClosedRange<Self>) -> Self {
+        let minimum = bounds.lowerBound
+        let maximum = bounds.upperBound
+
+        return  min(max(self, minimum), maximum)
     }
 }
