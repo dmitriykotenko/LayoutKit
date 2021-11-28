@@ -135,6 +135,11 @@ open class StackView: UIView {
 
     open override func layoutSubviews() {
         stackLayout.measurement(within: bounds.size).arrangement(within: bounds).makeViews(in: self)
+
+        // Add hidden subviews, so they always know their place in the hierarchy.
+        arrangedSubviews
+            .filter { $0.isHidden }
+            .forEach { addSubview($0) }
     }
 
     private var stackLayout: Layout {
