@@ -25,6 +25,7 @@ extension UIView {
         case let propagator as LayoutInvalidationPropagator:
             propagator.subviewDidInvalidateLayout(subview: subview)
         default:
+            setNeedsLayout()
             superview?.subviewNeedsToLayout(subview: self)
         }
     }
