@@ -105,17 +105,16 @@ extension StackLayout: ConfigurableLayout {
             sublayoutMeasurements[index] = sublayoutMeasurement
             let sublayoutAxisSize = AxisSize(axis: axis, size: sublayoutMeasurement.size)
 
-            if sublayoutAxisSize.axisLength > 0 {
-                // If we are the first sublayout in the stack, then no leading spacing is required.
-                // Otherwise account for the spacing.
-                let leadingSpacing = (usedSize.axisLength > 0) ? spacing : 0
-                usedSize.axisLength += leadingSpacing + sublayoutAxisSize.axisLength
-                usedSize.crossLength = max(usedSize.crossLength, sublayoutAxisSize.crossLength)
+            usedSize.axisLength += sublayoutAxisSize.axisLength + spacing
+            usedSize.crossLength = max(usedSize.crossLength, sublayoutAxisSize.crossLength)
 
-                // Reserve spacing for the next sublayout.
-                availableSize.axisLength -= sublayoutAxisSize.axisLength + spacing
-            }
+            // Reserve spacing for the next sublayout.
+            availableSize.axisLength -= sublayoutAxisSize.axisLength + spacing
         }
+
+        // For the first sublayout in the stack, no leading spacing is required.
+        // So remove extra spacing added during sublayouts' measuring.
+        usedSize.axisLength -= spacing
 
         let nonNilMeasuredSublayouts = sublayoutMeasurements.compactMap { $0 }
 
@@ -148,10 +147,7 @@ extension StackLayout: ConfigurableLayout {
             let sublayoutArrangement = sublayout.arrangement(within: CGRect(origin: nextOrigin.point, size: sublayoutAvailableSize.size))
             sublayoutArrangements.append(sublayoutArrangement)
             nextOrigin.axisOffset += sublayoutAvailableSize.axisLength
-            if sublayoutAvailableSize.axisLength > 0 {
-                // Only add spacing below a view if it was allocated non-zero height.
-                nextOrigin.axisOffset += config.axisSpacing
-            }
+            nextOrigin.axisOffset += config.axisSpacing
         }
         return LayoutArrangement(layout: self, frame: frame, sublayouts: sublayoutArrangements)
     }
