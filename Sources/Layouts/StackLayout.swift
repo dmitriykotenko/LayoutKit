@@ -112,11 +112,13 @@ extension StackLayout: ConfigurableLayout {
             availableSize.axisLength -= sublayoutAxisSize.axisLength + spacing
         }
 
+        let nonNilMeasuredSublayouts = sublayoutMeasurements.compactMap { $0 }
+
         // For the first sublayout in the stack, no leading spacing is required.
         // So remove extra spacing added during sublayouts' measuring.
-        usedSize.axisLength -= spacing
-
-        let nonNilMeasuredSublayouts = sublayoutMeasurements.compactMap { $0 }
+        if !nonNilMeasuredSublayouts.isEmpty {
+          usedSize.axisLength -= spacing
+        }
 
         if distribution == .fillEqualSize && !nonNilMeasuredSublayouts.isEmpty {
             let maxAxisLength = nonNilMeasuredSublayouts.map({ AxisSize(axis: axis, size: $0.size).axisLength }).max() ?? 0
