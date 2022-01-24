@@ -55,6 +55,8 @@ open class StackView: UIView {
 
     private var arrangedSubviews: [UIView] = []
 
+    private var subviewVisibilityListeners: [NSKeyValueObservation] = []
+
     public init(axis: Axis,
                 spacing: CGFloat = 0,
                 distribution: StackLayoutDistribution = .leading,
@@ -95,6 +97,8 @@ open class StackView: UIView {
         updateContentHuggingPriority()
         invalidateIntrinsicContentSize()
         setNeedsLayout()
+
+        listenForSubviewVisibilities()
     }
 
     private func updateContentHuggingPriority() {
@@ -107,6 +111,16 @@ open class StackView: UIView {
             .from(stackLayout.flexibility.flex(.vertical)),
             for: .vertical
         )
+    }
+
+    private func listenForSubviewVisibilities() {
+        subviewVisibilityListeners = arrangedSubviews.map {
+            // Every time a subview becomes hidden or visible,
+            // the layout should be recalculated.
+            $0.observe(\.isHidden) { [weak self] subview, _ in
+                self?.subviewNeedsToLayout(subview: subview)
+            }
+        }
     }
 
     /**
